@@ -5,11 +5,16 @@
  *
  * @author    Marcos Mercedes <marcos.mercedesn@gmail.com>
  */
+namespace TRest;
 
-require_once realpath(__DIR__ . DIRECTORY_SEPARATOR . 'TRestConfig.php');
-require_once realpath(__DIR__ . DIRECTORY_SEPARATOR . 'TRestRequest.php');
-require_once realpath(__DIR__ . DIRECTORY_SEPARATOR . 'TRestClient.php');
-require_once realpath(__DIR__ . DIRECTORY_SEPARATOR . 'TRestModel.php');
+use TRest\Config\TRestConfigFactory;
+use TRest\Config\TRestConfig;
+
+spl_autoload_register(function ($class) {
+    $classParts = explode("\\", $class);
+    if($classParts[0] == __NAMESPACE__)
+        require __DIR__ . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, array_slice($classParts, 1)) . '.php';
+});
 
 /**
  * Api brought to you by Josue Abreu <https://github.com/gotjosh> from Pixel Perfect Tree <http://pixelpt.com/>
