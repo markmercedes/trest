@@ -6,6 +6,8 @@
  * @author    Marcos Mercedes <marcos.mercedesn@gmail.com>
  */
 
+namespace TRest\Http;
+
 class TRestClient {
 
     const POST = 'POST';
@@ -71,7 +73,7 @@ class TRestClient {
             $error = curl_error($ch);
             curl_close($ch);
             
-            throw new Exception($errorNumber . ': ' . $error);
+            throw new \Exception($errorNumber . ': ' . $error);
         }
         
         curl_close($ch);

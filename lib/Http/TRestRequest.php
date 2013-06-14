@@ -6,6 +6,8 @@
  * @author    Marcos Mercedes <marcos.mercedesn@gmail.com>
  */
 
+namespace TRest\Http;
+
 class TRestRequest {
 
     private $url;

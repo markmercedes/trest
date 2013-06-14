@@ -1,5 +1,11 @@
 <?php
 
+namespace TRest\Models;
+
+use TRest\Config\TRestConfigFactory;
+use TRest\Http\TRestClient;
+use TRest\Http\TRestRequest;
+
 abstract class TRestModel {
 
     const BELONGS_TO = 'RBelongsToRelation';
@@ -13,7 +19,7 @@ abstract class TRestModel {
     private static $requestClient;
 
     protected static $singleItemNode;
-    
+
     protected static $listItemNode;
 
     protected static $configName = 'default';
@@ -45,39 +51,59 @@ abstract class TRestModel {
         return $result;
     }
 
-    protected static function mapToObject($json_obj, $class) {
-        $obj = new $class();
-        $fields = $obj->fields();
-        $relations = $obj->relations();
-        foreach ($json_obj as $key => $value) {
-            if (array_key_exists($key, $fields)) {
+    protected function assignPropertyValues($values, $fields) {
+        $relations = $this->relations();
+        foreach ($fields as $key => $value) {
+            $this->{$key} = isset($values->{$key}) ? $values->{$key} : null;
+            if (isset($values->{$key})) {
                 switch ($fields[$key]['type']) {
-                    case 'DateTime' : {
-                        if(array_key_exists('format', $fields[$key])){
-                            $date = new DateTime();
-                            $date->setTimestamp($value);
-                            $obj->$key = $date;
-                        } else {
-                            $obj->$key = new DateTime($value);
+                    case 'DateTime' :
+                        {
+                            if (array_key_exists('format', $fields[$key])) {
+                                $date = new \DateTime();
+                                $date->setTimestamp($values->{$key});
+                                $this->{$key} = $date;
+                            } else {
+                                $this->{$key} = new \DateTime($values->{$key});
+                            }
                         }
-                    }; break;
+                        ;
+                        break;
                     default :
-                        $obj->$key = $value;
+                        $this->{$key} = $values->{$key};
                         break;
                 }
-            } else if (array_key_exists($key, $relations)) {
-                if ($relations[$key]['type'] == self::HAS_MANY) {
-                    $obj->$key = array();
-                    foreach ($value as $childObject) {
-                        $obj->{$key}[] = self::mapToObject($childObject, $relations[$key]['class']);
-                    }
-                } else {
-                    // Default relation => HAS_ONE
-                    $obj->$key = self::mapToObject($value, $relations[$key]['class']);
-                }
+            } else {
+                $this->assignEmptyFieldValue($key, $fields[$key]['type']);
             }
         }
         return $obj;
+    }
+
+    protected function assignRelations($values, $relations) {
+        foreach ($relations as $key => $value) {
+            if (isset($values->{$key})) {
+                if ($value['type'] == self::HAS_MANY) {
+                    $obj->$key = array();
+                    foreach ($values->{$key} as $childObject) {
+                        $obj->{$key}[] = self::mapToObject($childObject, $relations[$key]['class']);
+                    }
+                } else {
+                    $this->{$key} = self::mapToObject($values->{$key}, $value['class']);
+                }
+            }
+        }
+    }
+
+    protected function assignEmptyFieldValue($fieldName, $type) {
+        if ($type == 'integer')
+            $this->{$fieldName} = 0;
+        else
+            $this->{$fieldName} = null;
+    }
+
+    protected static function mapToObject($json_obj, $class) {
+        return new $class($json_obj);
     }
 
     public function fields() {
@@ -98,7 +124,7 @@ abstract class TRestModel {
             $result = $response;
         return is_array($result) ? $result[0] : $result;
     }
-    
+
     public function getListItemNode($response) {
         $result = null;
         if (static::$listItemNode)
@@ -109,17 +135,16 @@ abstract class TRestModel {
             $result = $response;
         return $result;
     }
-    
 
-    public function __construct() {
+    public function __construct($values = null) {
         $fields = $this->fields();
-        foreach ($fields as $key => $value) {
-            if ($value['type'] == 'integer')
-                $this->{$key} = 0;
-            else
-                $this->{$key} = null;
+        if ($values) {
+            $this->assignPropertyValues($values, $fields);
+            $this->assignRelations($values, $this->relations());
+        } else {
+            foreach ($fields as $key => $value) {
+                $this->assignEmptyPropertyValue($key, $value['type']);
+            }
         }
     }
 }
-
-?>
