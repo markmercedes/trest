@@ -23,6 +23,8 @@ abstract class TRestModel {
     protected static $listItemNode;
 
     protected static $configName = 'default';
+    
+    protected static $listCountNode;
 
     protected static function getConfig() {
         return TRestConfigFactory::get(static::$configName);
@@ -38,15 +40,18 @@ abstract class TRestModel {
     }
 
     public static function findAll($limit = 0, $page = 0, $params = array()) {
-        $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setResource(static::$resource);
+        $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setResource(static::$resource)->setParameters($params);
         if ($limit)
             $request->setParameter('limit', $limit);
         if ($page)
             $request->setParameter('page', $page);
-        $result = array();
-        $items = self::getListItemNode(self::getRequestClient()->get($request));
-        foreach ($items as $item) {
-            $result[] = self::mapToObject($item, get_called_class());
+        $result = new \stdClass();
+        $result->items = array();
+        $response = self::getRequestClient()->get($request);
+        $responseItems = self::getListItemNode($response);
+        $result->count = self::getListCountNode($response);
+        foreach ($responseItems as $item) {
+            $result->items[] = self::mapToObject($item, get_called_class());
         }
         return $result;
     }
@@ -77,7 +82,6 @@ abstract class TRestModel {
                 $this->assignEmptyFieldValue($key, $fields[$key]['type']);
             }
         }
-        return $obj;
     }
 
     protected function assignRelations($values, $relations) {
@@ -125,7 +129,7 @@ abstract class TRestModel {
         return is_array($result) ? $result[0] : $result;
     }
 
-    public function getListItemNode($response) {
+    public static function getListItemNode($response) {
         $result = null;
         if (static::$listItemNode)
             $result = $response->{static::$listItemNode};
@@ -134,6 +138,15 @@ abstract class TRestModel {
         else
             $result = $response;
         return $result;
+    }
+    
+    public function getListCountNode($response) {
+        $result = 0;
+        if (static::$listCountNode)
+            $result = $response->{static::$listCountNode};
+        else if (self::getConfig()->getListCountNode())
+            $result = $response->{self::getConfig()->getListCountNode()};
+        return $result;        
     }
 
     public function __construct($values = null) {

@@ -11,12 +11,14 @@ class TRestConfig {
 
     public function __construct($parameters) {
         $this->apiUrl = $parameters['apiUrl'];
-        if(array_key_exists('singleItemNode', $parameters))
+        if (array_key_exists('singleItemNode', $parameters))
             $this->singleItemNode = $parameters['singleItemNode'];
-        if(array_key_exists('listItemNode', $parameters))
+        if (array_key_exists('listItemNode', $parameters))
             $this->listItemNode = $parameters['listItemNode'];
-        if(array_key_exists('cacheAdapter', $parameters))
+        if (array_key_exists('cacheAdapter', $parameters))
             $this->cacheAdapter = $parameters['cacheAdapter'];
+        if (array_key_exists('listCountNode', $parameters))
+            $this->listCountNode = $parameters['listCountNode'];
     }
 
     /**
@@ -38,21 +40,36 @@ class TRestConfig {
      *      of a property of the json result
      */
     private $listItemNode;
-    
+
     /**
-     * 
-     * @var CacheAdapter, has a cache adapter instance that should be used to cache data in the models
+     *
+     * @var CacheAdapter, has a cache adapter instance that should be used to
+     *      cache data in the models
      */
     private $cacheAdapter;
 
     /**
+     *
+     * @var string, the name of the node that has the item count for a list result
+     */
+    private $listCountNode;
+
+    /**
+     * @return the $listCountNode
+     */
+    public function getListCountNode() {
+        return $this->listCountNode;
+    }
+
+	/**
+     *
      * @return the $cacheAdapter
      */
     public function getCacheAdapter() {
         return $this->cacheAdapter;
     }
 
-	/**
+    /**
      *
      * @return the $api_url
      */
