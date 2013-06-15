@@ -50,18 +50,20 @@ class TRestConfig {
 
     /**
      *
-     * @var string, the name of the node that has the item count for a list result
+     * @var string, the name of the node that has the item count for a list
+     *      result
      */
     private $listCountNode;
 
     /**
+     *
      * @return the $listCountNode
      */
     public function getListCountNode() {
         return $this->listCountNode;
     }
 
-	/**
+    /**
      *
      * @return TRestCacheAdapterInterface
      */
