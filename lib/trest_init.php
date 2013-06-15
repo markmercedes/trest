@@ -7,8 +7,13 @@
  */
 namespace TRest;
 
+define('TREST_LIB_PATH', __DIR__);
+define('TREST_LIB_THIRD_PARTY_PATH', TREST_LIB_PATH . DIRECTORY_SEPARATOR . 'ThirdParty');
+define('TREST_DEFAULT_CACHE_TTL', 120);
+
 use TRest\Config\TRestConfigFactory;
 use TRest\Config\TRestConfig;
+use TRest\Cache\TRestFastCache;
 
 spl_autoload_register(function ($class) {
     $classParts = explode("\\", $class);
@@ -22,7 +27,8 @@ spl_autoload_register(function ($class) {
 
 TRestConfigFactory::add('default', new TRestConfig(array(
 'apiUrl' => 'http://pixelpt-sandwich-api.herokuapp.com/',
-'singleItemNode' => 'sandwich'
+'singleItemNode' => 'sandwich',
+'cacheAdapter' => new TRestFastCache()
 )));
 
 /**
@@ -31,5 +37,5 @@ TRestConfigFactory::add('default', new TRestConfig(array(
 
 TRestConfigFactory::add('StackOverflow', new TRestConfig(array(
 'apiUrl' => 'http://api.stackoverflow.com/1.1/',
+'cacheAdapter' => new TRestFastCache()
 )));
-
