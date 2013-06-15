@@ -1,5 +1,7 @@
 <?php
 
+use TRest\Models\TRestModel;
+
 class Sandwich extends TRestModel {
 
     protected static $resource = 'sandwiches';

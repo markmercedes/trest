@@ -1,5 +1,7 @@
 <?php
 
+use TRest\Models\TRestModel;
+
 class StackOverflowUserBadge extends TRestModel {
 
     public function fields() {

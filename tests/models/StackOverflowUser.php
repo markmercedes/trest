@@ -1,5 +1,7 @@
 <?php
 
+use TRest\Models\TRestModel;
+
 class StackOverflowUser extends TRestModel {
     
     protected static $configName = 'StackOverflow';
