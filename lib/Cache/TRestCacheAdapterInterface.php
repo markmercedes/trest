@@ -12,7 +12,14 @@ interface TRestCacheAdapterInterface {
     
     public function get($key);
     
-    public function set($key, $data, $ttl);
+    /**
+     * 
+     * @param string $key
+     * @param $data
+     * @param integer $ttl
+     * @return TRestCacheAdapter
+     */
+    public function set($key, $data, $ttl = TREST_DEFAULT_CACHE_TTL);
     
     public function exists($key);
     
