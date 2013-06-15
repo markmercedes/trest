@@ -81,7 +81,6 @@ abstract class TRestModel {
     }
 
     protected function assignPropertyValues($values, $fields) {
-        $relations = $this->relations();
         foreach ($fields as $key => $value) {
             $this->{$key} = isset($values->{$key}) ? $values->{$key} : null;
             if (isset($values->{$key})) {
@@ -112,9 +111,9 @@ abstract class TRestModel {
         foreach ($relations as $key => $value) {
             if (isset($values->{$key})) {
                 if ($value['type'] == self::HAS_MANY) {
-                    $obj->$key = array();
+                    $this->{$key} = array();
                     foreach ($values->{$key} as $childObject) {
-                        $obj->{$key}[] = self::mapToObject($childObject, $relations[$key]['class']);
+                        $this->{$key}[] = self::mapToObject($childObject, $relations[$key]['class']);
                     }
                 } else {
                     $this->{$key} = self::mapToObject($values->{$key}, $value['class']);
