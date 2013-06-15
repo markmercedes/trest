@@ -3,6 +3,7 @@
 namespace TRest\Models;
 
 use TRest\Config\TRestConfigFactory;
+use TRest\Config\TRestConfig;
 use TRest\Http\TRestClient;
 use TRest\Http\TRestRequest;
 
@@ -23,9 +24,15 @@ abstract class TRestModel {
     protected static $listItemNode;
 
     protected static $configName = 'default';
-    
-    protected static $listCountNode;
 
+    protected static $listCountNode;
+    
+    private static $isCacheEnabled;
+
+    /**
+     *
+     * @return TRestConfig
+     */
     protected static function getConfig() {
         return TRestConfigFactory::get(static::$configName);
     }
@@ -34,12 +41,20 @@ abstract class TRestModel {
         return self::$requestClient ? self::$requestClient : self::$requestClient = new TRestClient();
     }
 
-    public static function find($id, $params = array()) {
+    public static function find($id, $params = array(), $cacheTtl = TREST_DEFAULT_CACHE_TTL) {
         $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setResource(static::$resource)->setPath($id)->setParameters($params);
-        return self::mapToObject(self::getSingleItemNode(self::getRequestClient()->get($request)), get_called_class());
+        $url = $request->buildUrl();
+        if (self::isValidCache($cacheTtl)) {
+            if (self::getConfig()->getCacheAdapter()->exists($url)) {
+                return self::getConfig()->getCacheAdapter()->get($url);
+            }
+            return self::getConfig()->getCacheAdapter()->set($url, self::mapToObject(self::getSingleItemNode(self::getRequestClient()->get($request)), get_called_class()), $cacheTtl)->get($url);
+        } else {
+            return self::mapToObject(self::getSingleItemNode(self::getRequestClient()->get($request)), get_called_class());
+        }
     }
 
-    public static function findAll($limit = 0, $page = 0, $params = array()) {
+    public static function findAll($limit = 0, $page = 0, $params = array(), $cacheTtl = TREST_DEFAULT_CACHE_TTL) {
         $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setResource(static::$resource)->setParameters($params);
         if ($limit)
             $request->setParameter('limit', $limit);
@@ -47,11 +62,20 @@ abstract class TRestModel {
             $request->setParameter('page', $page);
         $result = new \stdClass();
         $result->items = array();
+        $url = $request->buildUrl();
+        if (self::isValidCache($cacheTtl)) {
+            if (self::getConfig()->getCacheAdapter()->exists($url)) {
+                return self::getConfig()->getCacheAdapter()->get($url);
+            }
+        }
         $response = self::getRequestClient()->get($request);
         $responseItems = self::getListItemNode($response);
         $result->count = self::getListCountNode($response);
         foreach ($responseItems as $item) {
             $result->items[] = self::mapToObject($item, get_called_class());
+        }
+        if (self::isValidCache($cacheTtl)) {
+            self::getConfig()->getCacheAdapter()->set($url, $result, $cacheTtl);
         }
         return $result;
     }
@@ -118,7 +142,7 @@ abstract class TRestModel {
         return array();
     }
 
-    public function getSingleItemNode($response) {
+    public static function getSingleItemNode($response) {
         $result = null;
         if (static::$singleItemNode)
             $result = $response->{static::$singleItemNode};
@@ -139,14 +163,26 @@ abstract class TRestModel {
             $result = $response;
         return $result;
     }
-    
+
     public function getListCountNode($response) {
         $result = 0;
         if (static::$listCountNode)
             $result = $response->{static::$listCountNode};
         else if (self::getConfig()->getListCountNode())
             $result = $response->{self::getConfig()->getListCountNode()};
-        return $result;        
+        return $result;
+    }
+
+    public static function isCacheEnabled() {
+        if(self::$isCacheEnabled === null){
+            $parents = class_implements(get_class(self::getConfig()->getCacheAdapter()));
+            return self::$isCacheEnabled = isset($parents['TRest\Cache\TRestCacheAdapterInterface']);
+        }
+        return self::$isCacheEnabled;
+    }
+    
+    public static function isValidCache($cacheTtl){
+        return ( self::isCacheEnabled() && ($cacheTtl > 0) );
     }
 
     public function __construct($values = null) {
