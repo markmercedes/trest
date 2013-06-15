@@ -63,7 +63,7 @@ class TRestConfig {
 
 	/**
      *
-     * @return the $cacheAdapter
+     * @return TRestCacheAdapterInterface
      */
     public function getCacheAdapter() {
         return $this->cacheAdapter;
