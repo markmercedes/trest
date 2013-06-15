@@ -48,7 +48,10 @@ abstract class TRestModel {
             if (self::getConfig()->getCacheAdapter()->exists($url)) {
                 return self::getConfig()->getCacheAdapter()->get($url);
             }
-            return self::getConfig()->getCacheAdapter()->set($url, self::mapToObject(self::getSingleItemNode(self::getRequestClient()->get($request)), get_called_class()), $cacheTtl)->get($url);
+            $singleItemNode = self::getSingleItemNode(self::getRequestClient()->get($request));
+            if(!$singleItemNode)
+                return null;
+            return self::getConfig()->getCacheAdapter()->set($url, self::mapToObject($singleItemNode, get_called_class()), $cacheTtl)->get($url);
         } else {
             return self::mapToObject(self::getSingleItemNode(self::getRequestClient()->get($request)), get_called_class());
         }
@@ -102,7 +105,7 @@ abstract class TRestModel {
                         break;
                 }
             } else {
-                $this->assignEmptyFieldValue($key, $fields[$key]['type']);
+                $this->assignEmptyPropertyValue($key, $fields[$key]['type']);
             }
         }
     }
@@ -122,7 +125,7 @@ abstract class TRestModel {
         }
     }
 
-    protected function assignEmptyFieldValue($fieldName, $type) {
+    protected function assignEmptyPropertyValue($fieldName, $type) {
         if ($type == 'integer')
             $this->{$fieldName} = 0;
         else
@@ -130,6 +133,8 @@ abstract class TRestModel {
     }
 
     protected static function mapToObject($json_obj, $class) {
+        if(!$json_obj)
+            return null;
         return new $class($json_obj);
     }
 
@@ -142,6 +147,8 @@ abstract class TRestModel {
     }
 
     public static function getSingleItemNode($response) {
+        if(!$response)
+            return null;
         $result = null;
         if (static::$singleItemNode)
             $result = $response->{static::$singleItemNode};
