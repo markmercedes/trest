@@ -54,5 +54,6 @@ abstract class TRestModel extends TRestModelBase {
                 $this->assignEmptyPropertyValue($key, $value['type']);
             }
         }
+        $this->build();
     }
 }

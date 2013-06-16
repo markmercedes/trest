@@ -150,4 +150,6 @@ abstract class TRestModelEntity {
     protected static function getConfig() {
         return TRestConfigFactory::get(static::$configName);
     }
+    
+    public function build(){}
 }
