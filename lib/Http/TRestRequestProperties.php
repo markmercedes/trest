@@ -60,12 +60,13 @@ class TRestRequestProperties {
     }
 
     public function getParameters() {
-        return $this->parameters;
+        return (array_filter($this->parameters, function($element){
+            return $element ? true : false;
+        }));
     }
 
     public function setParameter($parameter, $value) {
-        if ($value)
-            $this->parameters[$parameter] = $value;
+        $this->parameters[$parameter] = $value;
         return $this;
     }
 
