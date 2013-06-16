@@ -10,7 +10,7 @@ namespace TRest\Http;
 class TRestRequest extends TRestRequestProperties {
 
     public function getUrlHash() {
-        return md5($this->buildUrl());
+        return md5($this->buildUrl() . '?' . implode('&', $this->getParameters()));
     }
 
     public function buildUrl() {
