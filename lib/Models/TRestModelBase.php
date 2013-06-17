@@ -134,7 +134,7 @@ abstract class TRestModelEntity {
         return $result;
     }
 
-    public function getListCountNode($response) {
+    public static function getListCountNode($response) {
         $result = 0;
         if (static::$listCountNode)
             $result = $response->{static::$listCountNode};
