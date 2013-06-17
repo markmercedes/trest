@@ -6,8 +6,8 @@ use TRest\Http\TRestRequest;
 
 abstract class TRestModel extends TRestModelBase {
 
-    public static function find($id, $params = array(), $cacheTtl = TREST_DEFAULT_CACHE_TTL) {
-        $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setResource(static::$resource)->setPath($id)->setParameters($params);
+    public static function find($id, $params = array(), $path = null, $cacheTtl = TREST_DEFAULT_CACHE_TTL) {
+        $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path)->setResource(static::$resource)->setPath($id)->setParameters($params);
         $cacheKey = $request->getUrlHash();
         if (self::isValidCache($cacheTtl)) {
             if (self::getConfig()->getCacheAdapter()->exists($cacheKey)) {
@@ -22,8 +22,8 @@ abstract class TRestModel extends TRestModelBase {
         }
     }
 
-    public static function findAll($limit = 0, $page = 0, $params = array(), $cacheTtl = TREST_DEFAULT_CACHE_TTL) {
-        $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setResource(static::$resource)->setParameters($params)->setParameter('limit', $limit)->setParameter('page', $page);
+    public static function findAll($limit = 0, $page = 0, $params = array(), $path = null, $cacheTtl = TREST_DEFAULT_CACHE_TTL) {
+        $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path)->setResource(static::$resource)->setParameters($params)->setParameter('limit', $limit)->setParameter('page', $page);
         $cacheKey = $request->getUrlHash();
         if (self::isValidCache($cacheTtl)) {
             if (self::getConfig()->getCacheAdapter()->exists($cacheKey)) {
