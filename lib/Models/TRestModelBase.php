@@ -6,67 +6,51 @@ use TRest\Config\TRestConfigFactory;
 use TRest\Config\TRestConfig;
 use TRest\Http\TRestClient;
 
-abstract class TRestModelBase extends TRestModelEntity {
-
-    protected static $requestClient;
-
-    protected static function getRequestClient() {
-        return self::$requestClient ? self::$requestClient : self::$requestClient = new TRestClient();
-    }
-
-    protected function assignPropertyValues($values, $fields) {
-        foreach ($fields as $key => $value) {
-            $this->{$key} = isset($values->{$key}) ? $values->{$key} : null;
-            if (isset($values->{$key})) {
-                switch ($fields[$key]['type']) {
-                    case 'DateTime' :
-                        {
-                            if (array_key_exists('format', $fields[$key])) {
-                                $date = new \DateTime();
-                                $date->setTimestamp($values->{$key});
-                                $this->{$key} = $date;
-                            } else {
-                                $this->{$key} = new \DateTime($values->{$key});
-                            }
-                        }
-                        ;
-                        break;
-                    default :
-                        $this->{$key} = $values->{$key};
-                        break;
-                }
-            } else {
-                $this->assignEmptyPropertyValue($key, $fields[$key]['type']);
-            }
-        }
-    }
-
-    protected function assignRelations($values, $relations) {
-        foreach ($relations as $key => $value) {
-            if (isset($values->{$key})) {
-                if ($value['type'] == self::HAS_MANY) {
-                    $this->{$key} = array();
-                    foreach ($values->{$key} as $childObject) {
-                        $this->{$key}[] = self::mapToObject($childObject, $relations[$key]['class']);
-                    }
-                } else {
-                    $this->{$key} = self::mapToObject($values->{$key}, $value['class']);
-                }
-            }
-        }
-    }
-
-    protected function assignEmptyPropertyValue($fieldName, $type) {
-        if ($type == 'integer')
-            $this->{$fieldName} = 0;
-        else
-            $this->{$fieldName} = null;
-    }
+abstract class TRestModelMapper extends TRestModelEntity {
 
     protected static function mapToObject($json_obj, $class) {
         if (! $json_obj)
             return null;
         return new $class($json_obj);
+    }
+
+    public function mapToJSON() {
+        $jsonObj = new \stdClass();
+        $fields = $this->fields();
+        foreach ($fields as $key => $value) {
+            /**
+             * Avoid to post the record id for new fields
+             */
+            if ((!$this->{static::$recordId}) && $key != (string)static::$recordId) {
+                $jsonObj->{$key} = $this->{$key};
+            } else if ($this->{static::$recordId}){
+                $jsonObj->{$key} = $this->{$key};
+            }
+        }
+        $relations = $this->relations();
+        if (count($relations)) {
+            $jsonObj = $this->mapRelationsToJSON($jsonObj, $relations);
+        }
+        return $jsonObj;
+    }
+
+    public function mapRelationsToJSON($jsonObj, $relations) {
+        foreach ($relations as $key => $value) {
+            $postOnSave = @$value['postOnSave'];
+            if ($postOnSave) {
+                $postSuffix = @$value['postSuffix'];
+                if ($postSuffix) {
+                    $c = $this->{$key};
+                    $jsonObj->{$key . $postSuffix} = array();
+                    foreach ($c as $i) {
+                        $jsonObj->{$key . $postSuffix}[] = $i->mapToJSON();
+                    }
+                } else {
+                    $jsonObj->{$key} = $this->{$key};
+                }
+            }
+        }
+        return $jsonObj;
     }
 }
 
@@ -89,6 +73,8 @@ abstract class TRestModelEntity {
     protected static $listCountNode;
 
     protected static $isCacheEnabled;
+
+    protected static $recordId = 'id';
 
     public function fields() {
         return array();
@@ -150,6 +136,65 @@ abstract class TRestModelEntity {
     protected static function getConfig() {
         return TRestConfigFactory::get(static::$configName);
     }
-    
-    public function build(){}
+
+    public function build() {
+    }
+}
+
+abstract class TRestModelBase extends TRestModelMapper {
+
+    protected static $requestClient;
+
+    protected static function getRequestClient() {
+        return self::$requestClient ? self::$requestClient : self::$requestClient = new TRestClient();
+    }
+
+    protected function assignPropertyValues($values, $fields) {
+        foreach ($fields as $key => $value) {
+            $this->{$key} = isset($values->{$key}) ? $values->{$key} : null;
+            if (isset($values->{$key})) {
+                switch ($fields[$key]['type']) {
+                    case 'DateTime' :
+                        {
+                            if (array_key_exists('format', $fields[$key])) {
+                                $date = new \DateTime();
+                                $date->setTimestamp($values->{$key});
+                                $this->{$key} = $date;
+                            } else {
+                                $this->{$key} = new \DateTime($values->{$key});
+                            }
+                        }
+                        ;
+                        break;
+                    default :
+                        $this->{$key} = $values->{$key};
+                        break;
+                }
+            } else {
+                $this->assignEmptyPropertyValue($key, $fields[$key]['type']);
+            }
+        }
+    }
+
+    protected function assignRelations($values, $relations) {
+        foreach ($relations as $key => $value) {
+            if (isset($values->{$key})) {
+                if ($value['type'] == self::HAS_MANY) {
+                    $this->{$key} = array();
+                    foreach ($values->{$key} as $childObject) {
+                        $this->{$key}[] = self::mapToObject($childObject, $relations[$key]['class']);
+                    }
+                } else {
+                    $this->{$key} = self::mapToObject($values->{$key}, $value['class']);
+                }
+            }
+        }
+    }
+
+    protected function assignEmptyPropertyValue($fieldName, $type) {
+        if ($type == 'integer')
+            $this->{$fieldName} = 0;
+        else
+            $this->{$fieldName} = null;
+    }
 }

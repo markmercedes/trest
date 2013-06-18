@@ -6,6 +6,24 @@ use TRest\Http\TRestRequest;
 
 abstract class TRestModel extends TRestModelBase {
 
+    public function save() {
+        $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setResource(static::$resource)->setPath($this->{static::$recordId})->setEntity(json_encode(array(
+            static::$singleItemNode => $this->mapToJSON()
+        )));
+        $result = $this->{static::$recordId} ? self::getRequestClient()->put($request) : self::getRequestClient()->post($request);
+        if ($result)
+            $this->constructObject(self::getSingleItemNode($result));
+    }
+    
+    public function delete(){
+        $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setResource(static::$resource)->setPath($this->{static::$recordId});
+        self::getRequestClient()->delete($request);
+    }
+
+    /**
+     * 
+     * @return TRestModel
+     */
     public static function find($id, $params = array(), $path = null, $cacheTtl = TREST_DEFAULT_CACHE_TTL) {
         $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path)->setResource(static::$resource)->setPath($id)->setParameters($params);
         $cacheKey = $request->getUrlHash();
@@ -44,7 +62,7 @@ abstract class TRestModel extends TRestModelBase {
         return $result;
     }
 
-    public function __construct($values = null) {
+    protected function constructObject($values = null) {
         $fields = $this->fields();
         if ($values) {
             $this->assignPropertyValues($values, $fields);
@@ -54,6 +72,10 @@ abstract class TRestModel extends TRestModelBase {
                 $this->assignEmptyPropertyValue($key, $value['type']);
             }
         }
+    }
+
+    public function __construct($values = null) {
+        $this->constructObject($values);
         $this->build();
     }
 }
