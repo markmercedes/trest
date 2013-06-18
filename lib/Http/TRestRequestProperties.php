@@ -13,6 +13,8 @@ class TRestRequestProperties {
     protected $method = TRestClient::GET;
 
     protected $parameters = array();
+    
+    protected $entity;
 
     protected $username;
 
@@ -24,6 +26,15 @@ class TRestRequestProperties {
 
     public function setPath($path) {
         $this->path = $path;
+        return $this;
+    }
+    
+    public function getEntity() {
+        return $this->entity;
+    }
+
+    public function setEntity($entity) {
+        $this->entity = $entity;
         return $this;
     }
 

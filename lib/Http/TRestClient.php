@@ -53,7 +53,7 @@ class TRestClient {
     }
 
     private function setPostFields($ch, $request, $method) {
-        $entityProperties = $request->getParameter('entity');
+        $entityProperties = $request->getEntity();
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $entityProperties);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
@@ -68,7 +68,7 @@ class TRestClient {
         switch ($method) {
             case self::POST :
             case self::PUT :
-                $ch = $this->setPostFields($request, $method);
+                $ch = $this->setPostFields($ch, $request, $method);
                 break;
             case self::DELETE :
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);

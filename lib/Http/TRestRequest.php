@@ -13,18 +13,20 @@ class TRestRequest extends TRestRequestProperties {
         return md5($this->buildUrl() . '?' . implode('&', $this->getParameters()));
     }
 
-    public function buildUrl() {
+    public function buildUrl($addParameters = false) {
         $array = array(
-            $this->getUrl(),
+            rtrim($this->getUrl(),'/'),
             $this->getResource()
         );
         if ($this->getPath())
             $array[] = $this->getPath();
-        if (count($this->getParameters()))
-            $array[] = '?' . http_build_query($this->getParameters());
-        array_walk($array, function (&$item, $key) {
-            $item = rtrim($item, '/');
-        });
+        if ($addParameters) {
+            if (count($this->getParameters()))
+                $array[] = '?' . http_build_query($this->getParameters());
+            array_walk($array, function (&$item, $key) {
+                $item = rtrim($item, '/');
+            });
+        }
         return implode('/', $array);
     }
 }
