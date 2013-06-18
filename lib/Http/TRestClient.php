@@ -52,15 +52,26 @@ class TRestClient {
         return $ch;
     }
 
+    private function setPostFields($ch, $request, $method) {
+        $entityProperties = $request->getParameter('entity');
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $entityProperties);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($entityProperties)
+        ));
+        return $ch;
+    }
+
     private function setCurlMethod($ch, TRestRequest $request) {
-        switch ($request->getMethod()) {
+        $method = $request->getMethod();
+        switch ($method) {
             case self::POST :
             case self::PUT :
-                curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($request->getParameters()));
+                $ch = $this->setPostFields($request, $method);
                 break;
             case self::DELETE :
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
                 break;
             case self::GET :
             default :
@@ -72,11 +83,10 @@ class TRestClient {
     public function execute(TRestRequest $request) {
         $ch = $this->setCurlMethod($this->getCurlInstance($request), $request);
         $result = curl_exec($ch);
-        if (! $result) {
-            $errorNumber = curl_errno($ch);
-            $error = curl_error($ch);
+        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($status >= 400) {
             curl_close($ch);
-            throw new \Exception($errorNumber . ': ' . $error);
+            throw new \Exception($result);
         }
         curl_close($ch);
         return json_decode($result);
