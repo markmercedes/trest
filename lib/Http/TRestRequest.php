@@ -13,7 +13,7 @@ class TRestRequest extends TRestRequestProperties {
         return md5($this->buildUrl() . '?' . implode('&', $this->getParameters()));
     }
 
-    public function buildUrl($addParameters = false) {
+    public function buildUrl($addParameters = true) {
         $array = array(
             rtrim($this->getUrl(),'/'),
             $this->getResource()
