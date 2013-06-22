@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * 
+ * Configuration class
+ *
+ * @author Marcos Mercedes <marcos.mercedesn@gmail.com>
+ * @package TRest\Config
+ */
+
 namespace TRest\Config;
 
 /**
