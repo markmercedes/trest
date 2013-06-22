@@ -21,9 +21,9 @@ abstract class TRestModelMapper extends TRestModelEntity {
             /**
              * Avoid to post the record id for new fields
              */
-            if ((!$this->{static::$recordId}) && $key != (string)static::$recordId) {
+            if ((! $this->{static::$recordId}) && $key != (string) static::$recordId) {
                 $jsonObj->{$key} = $this->{$key};
-            } else if ($this->{static::$recordId}){
+            } else if ($this->{static::$recordId}) {
                 $jsonObj->{$key} = $this->{$key};
             }
         }
@@ -35,20 +35,31 @@ abstract class TRestModelMapper extends TRestModelEntity {
     }
 
     public function mapRelationsToJSON($jsonObj, $relations) {
-        foreach ($relations as $key => $value) {
-            $postOnSave = @$value['postOnSave'];
-            if ($postOnSave) {
-                $postSuffix = @$value['postSuffix'];
-                if ($postSuffix) {
-                    $c = $this->{$key};
-                    $jsonObj->{$key . $postSuffix} = array();
-                    foreach ($c as $i) {
-                        $jsonObj->{$key . $postSuffix}[] = $i->mapToJSON();
-                    }
-                } else {
-                    $jsonObj->{$key} = $this->{$key};
-                }
+        foreach ($relations as $relationName => $relationData) {
+            if (@$relationData['postOnSave']) {
+                $postedPropertyName = $relationName . (@$relationData['postSuffix'] ? @$relationData['postSuffix'] : '');
+                $jsonObj = $this->mapRelationToJSON($jsonObj, $relationName, $postedPropertyName, $relationData);
             }
+        }
+        return $jsonObj;
+    }
+
+    private function mapRelationToJSON($jsonObj, $relationName, $postedPropertyName, $relationData) {
+        if (isset($this->{$relationName})) {
+            $relationProperty = $this->{$relationName};
+            if ((@$relationData['type']) == self::HAS_MANY) {
+                $jsonObj = $this->mapHasManyRelationToJson($jsonObj, $postedPropertyName, $relationProperty);
+            } else if ((@$relationData['type']) == self::HAS_ONE) {
+                $jsonObj->{$postedPropertyName} = $relationProperty->mapToJSON();
+            }
+        }
+        return $jsonObj;
+    }
+
+    private function mapHasManyRelationToJson($jsonObj, $postedPropertyName, $relationProperty) {
+        $jsonObj->{$postedPropertyName} = array();
+        foreach ($relationProperty as $relationPropertyItem) {
+            $jsonObj->{$postedPropertyName}[] = $relationPropertyItem->mapToJSON();
         }
         return $jsonObj;
     }
