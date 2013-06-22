@@ -6,9 +6,16 @@ namespace TRest\Config;
  * This class contains the global configurations for this library
  *
  * @author Marcos Mercedes <marcos.mercedesn@gmail.com>
+ * @package TRest\Config
  */
 class TRestConfig {
 
+    /**
+     *
+     * @param array $parameters
+     *            values => {'apiUrl' (required), 'singleItemNode',
+     *            'cacheAdapter', 'listCountNode'}
+     */
     public function __construct($parameters) {
         $this->apiUrl = $parameters['apiUrl'];
         if (array_key_exists('singleItemNode', $parameters))
