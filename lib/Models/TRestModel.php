@@ -13,6 +13,7 @@ abstract class TRestModel extends TRestModelBase {
         $result = $this->{static::$recordId} ? self::getRequestClient()->put($request) : self::getRequestClient()->post($request);
         if ($result)
             $this->constructObject(self::getSingleItemNode($result));
+        return true;
     }
     
     public function delete(){
