@@ -1,19 +1,46 @@
 <?php
 
+/**
+ *
+ * Base model classes to decouple logic from the {@link TRestModel} class
+ *
+ * @author Marcos Mercedes <marcos.mercedesn@gmail.com>
+ * @package TRest\Models
+ */
 namespace TRest\Models;
 
 use TRest\Config\TRestConfigFactory;
 use TRest\Config\TRestConfig;
 use TRest\Http\TRestClient;
 
+/**
+ *
+ * This class contains the methods to map plain objetcs to {@link TRestModel}
+ * instances and viceversa
+ *
+ * @author Marcos Mercedes <marcos.mercedesn@gmail.com>
+ * @package TRest\Models
+ */
 abstract class TRestModelMapper extends TRestModelEntity {
 
+    /**
+     *
+     * @param object $json_obj            
+     * @param string $class
+     *            classname
+     * @return TRest\Models\TRestModel
+     */
     protected static function mapToObject($json_obj, $class) {
         if (! $json_obj)
             return null;
         return new $class($json_obj);
     }
 
+    /**
+     * converts $this to a valid it's JSON representation
+     *
+     * @return \stdClass
+     */
     public function mapToJSON() {
         $jsonObj = new \stdClass();
         $fields = $this->fields();
@@ -34,6 +61,14 @@ abstract class TRestModelMapper extends TRestModelEntity {
         return $jsonObj;
     }
 
+    /**
+     *
+     * Adds the relations to a JSON representation of $this
+     *
+     * @param \stdClass $jsonObj            
+     * @param array $relations            
+     * @return \stdClass
+     */
     public function mapRelationsToJSON($jsonObj, $relations) {
         foreach ($relations as $relationName => $relationData) {
             if (@$relationData['postOnSave']) {
@@ -44,6 +79,16 @@ abstract class TRestModelMapper extends TRestModelEntity {
         return $jsonObj;
     }
 
+    /**
+     *
+     * Maps a single relations to it's JSON representation
+     *
+     * @param \stdClass $jsonObj            
+     * @param string $relationName            
+     * @param string $postedPropertyName            
+     * @param string $relationData            
+     * @return \stdClass
+     */
     private function mapRelationToJSON($jsonObj, $relationName, $postedPropertyName, $relationData) {
         if (isset($this->{$relationName})) {
             $relationProperty = $this->{$relationName};
@@ -56,6 +101,15 @@ abstract class TRestModelMapper extends TRestModelEntity {
         return $jsonObj;
     }
 
+    /**
+     *
+     * Maps a self::HAS_MANY relation to it's JSON representation
+     *
+     * @param \stdClass $jsonObj            
+     * @param string $postedPropertyName            
+     * @param string $relationProperty            
+     * @return \stdClass
+     */
     private function mapHasManyRelationToJson($jsonObj, $postedPropertyName, $relationProperty) {
         $jsonObj->{$postedPropertyName} = array();
         foreach ($relationProperty as $relationPropertyItem) {
@@ -65,6 +119,13 @@ abstract class TRestModelMapper extends TRestModelEntity {
     }
 }
 
+/**
+ *
+ * Base model class, the father of the models
+ *
+ * @author Marcos Mercedes <marcos.mercedesn@gmail.com>
+ * @package TRest\Models
+ */
 abstract class TRestModelEntity {
 
     const BELONGS_TO = 'RBelongsToRelation';
@@ -73,28 +134,95 @@ abstract class TRestModelEntity {
 
     const HAS_MANY = 'RHasManyRelation';
 
+    /**
+     *
+     * name of the config that will be used for this model
+     *
+     * @var string
+     */
     protected static $configName = 'default';
 
+    /**
+     *
+     * The name of the resource that will be handled by this model
+     *
+     * @var string
+     */
     protected static $resource;
 
+    /**
+     *
+     * if single items are returned inside a node here should go the name of
+     * that node
+     *
+     * @var string
+     */
     protected static $singleItemNode;
 
+    /**
+     *
+     * the name of the node that contains the list of items
+     *
+     * @var string
+     */
     protected static $listItemNode;
 
+    /**
+     *
+     * The name of the node that contains the total count of items retreived
+     *
+     * @var string
+     */
     protected static $listCountNode;
 
+    /**
+     *
+     * holds the information about the cache status
+     *
+     * @var boolean
+     */
     protected static $isCacheEnabled;
 
+    /**
+     *
+     * The name of the property that will be used as primaryKey
+     *
+     * @var string
+     */
     protected static $recordId = 'id';
 
+    /**
+     *
+     * An array of the fields that should be present in the model return array(
+     * 'id' => array( 'type' => 'integer' ),
+     *
+     * @return array
+     */
     public function fields() {
         return array();
     }
 
+    /**
+     *
+     * Available relations for this model return array( 'ingredients' => array(
+     * 'class' => 'Ingredient', 'type' => [self::HAS_MANY, self::HAS_ONE,
+     * self::BELONGS_TO 'postOnSave' => true, //If this relation should be
+     * included in the save method 'postSuffix' => '_attributes' //Adds a
+     * postSuffix to the name of the relation when posted, i.e:
+     * ingredients_attributes ) );
+     *
+     * @return array
+     */
     public function relations() {
         return array();
     }
 
+    /**
+     *
+     * Says if caching functionallity is enabled
+     *
+     * @return boolean
+     */
     public static function isCacheEnabled() {
         if (self::$isCacheEnabled === null) {
             $parents = class_implements(get_class(self::getConfig()->getCacheAdapter()));
@@ -103,10 +231,23 @@ abstract class TRestModelEntity {
         return self::$isCacheEnabled;
     }
 
+    /**
+     *
+     * returns if a number of seconds is a valid number to be cached
+     *
+     * @param number $cacheTtl            
+     * @return boolean
+     */
     public static function isValidCache($cacheTtl) {
         return (self::isCacheEnabled() && ($cacheTtl > 0));
     }
 
+    /**
+     *
+     * @see TRest\Models\TRestModelEntity::$singleItemNode
+     * @param string $response            
+     * @return string
+     */
     public static function getSingleItemNode($response) {
         if (! $response)
             return null;
@@ -120,6 +261,12 @@ abstract class TRestModelEntity {
         return is_array($result) ? $result[0] : $result;
     }
 
+    /**
+     *
+     * @see TRest\Models\TRestModelEntity::$listItemNode
+     * @param string $response            
+     * @return string
+     */
     public static function getListItemNode($response) {
         $result = null;
         if (static::$listItemNode)
@@ -131,6 +278,12 @@ abstract class TRestModelEntity {
         return $result;
     }
 
+    /**
+     *
+     * @see TRest\Models\TRestModelEntity::$countItemNode
+     * @param string $response            
+     * @return string
+     */
     public static function getListCountNode($response) {
         $result = 0;
         if (static::$listCountNode)
@@ -148,18 +301,49 @@ abstract class TRestModelEntity {
         return TRestConfigFactory::get(static::$configName);
     }
 
+    /**
+     * this function should be overwritten in the case you want to execute any
+     * code after the construction of the model, this function is invoked after
+     * construct
+     */
     public function build() {
     }
 }
 
+/**
+ *
+ * Base model class wich holds the information of the client used to perform
+ * HTTP. It's the responsable of assign values to the attributes
+ *
+ * @author Marcos Mercedes <marcos.mercedesn@gmail.com>
+ * @package TRest\Models
+ */
 abstract class TRestModelBase extends TRestModelMapper {
 
+    /**
+     *
+     * @var \TRest\Http\TRestClient
+     */
     protected static $requestClient;
 
+    /**
+     *
+     * returns the active {@link \TRest\Http\TRestClient} used to perform
+     * requests
+     *
+     * @return \TRest\Http\TRestClient
+     */
     protected static function getRequestClient() {
         return self::$requestClient ? self::$requestClient : self::$requestClient = new TRestClient();
     }
 
+    /**
+     *
+     * assigns values to model attributes
+     *
+     * @param object $values            
+     * @param array $fields            
+     */
     protected function assignPropertyValues($values, $fields) {
         foreach ($fields as $key => $value) {
             $this->{$key} = isset($values->{$key}) ? $values->{$key} : null;
@@ -187,6 +371,13 @@ abstract class TRestModelBase extends TRestModelMapper {
         }
     }
 
+    /**
+     *
+     * assigns values to attributes that are supposed relations
+     *
+     * @param object $values            
+     * @param array $relations            
+     */
     protected function assignRelations($values, $relations) {
         foreach ($relations as $key => $value) {
             if (isset($values->{$key})) {
@@ -202,6 +393,12 @@ abstract class TRestModelBase extends TRestModelMapper {
         }
     }
 
+    /**
+     * Assigns the default value to a field
+     *
+     * @param string $fieldName            
+     * @param string $type            
+     */
     protected function assignEmptyPropertyValue($fieldName, $type) {
         if ($type == 'integer')
             $this->{$fieldName} = 0;
