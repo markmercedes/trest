@@ -43,7 +43,11 @@ abstract class TRestModel extends TRestModelBase {
      * @return TRestModel
      */
     public static function find($id, $params = array(), $path = null, $cacheTtl = TREST_DEFAULT_CACHE_TTL) {
-        $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path)->setResource(static::$resource)->setPath($id)->setParameters($params);
+        if(is_array($path)){
+            $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path[1])->setResource($path[0])->setEntity($id)->setParameters($params);
+        } else {
+            $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path)->setResource(static::$resource)->setEntity($id)->setParameters($params);
+        }
         $cacheKey = $request->getUrlHash();
         if (self::isValidCache($cacheTtl)) {
             if (self::getConfig()->getCacheAdapter()->exists($cacheKey)) {
@@ -72,7 +76,11 @@ abstract class TRestModel extends TRestModelBase {
      * @return array of TRestModels
      */
     public static function findAll($limit = 0, $page = 0, $params = array(), $path = null, $cacheTtl = TREST_DEFAULT_CACHE_TTL) {
-        $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path)->setResource(static::$resource)->setParameters($params)->setParameter('limit', $limit)->setParameter('page', $page);
+        if(is_array($path)){
+            $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path[1])->setResource($path[0])->setParameters($params)->setParameter('limit', $limit)->setParameter('page', $page);
+        } else {
+            $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path)->setResource(static::$resource)->setParameters($params)->setParameter('limit', $limit)->setParameter('page', $page);
+        }
         $cacheKey = $request->getUrlHash();
         if (self::isValidCache($cacheTtl)) {
             if (self::getConfig()->getCacheAdapter()->exists($cacheKey)) {
@@ -80,7 +88,11 @@ abstract class TRestModel extends TRestModelBase {
             }
         }
         $response = self::getRequestClient()->get($request);
-        $responseItems = self::getListItemNode($response);
+        if(is_array($path) && array_key_exists('ITEM_NODE', $path)){
+            $responseItems = self::getListItemNode($response, $path['ITEM_NODE']);
+        } else {
+            $responseItems = self::getListItemNode($response);
+        }
         $result = new \stdClass();
         $result->items = array();
         $result->count = self::getListCountNode($response);

@@ -28,7 +28,9 @@ class Sandwich extends TRestModel {
         return array(
             'ingredients' => array(
                 'class' => 'Ingredient',
-                'type' => self::HAS_MANY
+                'type' => self::HAS_MANY,
+                'postOnSave' => true,
+                'postSuffix' => '_attributes'
             )
         );
     }

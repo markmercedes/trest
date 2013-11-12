@@ -34,6 +34,8 @@ class TRestRequest extends TRestRequestProperties {
         );
         if ($this->getPath())
             $array[] = $this->getPath();
+        if ($this->getEntity())
+            $array[] = $this->getEntity();
         if ($addParameters) {
             if (count($this->getParameters()))
                 $array[] = '?' . http_build_query($this->getParameters());

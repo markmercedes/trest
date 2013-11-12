@@ -267,7 +267,12 @@ abstract class TRestModelEntity {
      * @param string $response            
      * @return string
      */
-    public static function getListItemNode($response) {
+    public static function getListItemNode($response, $itemNode = 'NONE') {
+        if(($itemNode != 'NONE')){
+            if(!$itemNode)
+                return $response;
+            return $response->{$itemNode};
+        }
         $result = null;
         if (static::$listItemNode)
             $result = $response->{static::$listItemNode};
