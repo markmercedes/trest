@@ -27,14 +27,14 @@ class Request extends RequestProperties {
      *            returned
      * @return string
      */
-    public function buildUrl($addParameters = true) {
+    public function buildUrl($addParameters = true, $addEntity = true) {
         $array = array(
             rtrim($this->getUrl(), '/'),
             $this->getResource()
         );
         if ($this->getPath())
             $array[] = $this->getPath();
-        if ($this->getEntity())
+        if ($addEntity && $this->getEntity())
             $array[] = $this->getEntity();
         if ($addParameters) {
             if (count($this->getParameters()))

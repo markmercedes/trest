@@ -71,7 +71,7 @@ class Client {
      */
     private function getCurlInstance(Request $request) {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $request->buildUrl());
+        curl_setopt($ch, CURLOPT_URL, $request->buildUrl(true, ($request->getMethod() == 'GET')));
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');

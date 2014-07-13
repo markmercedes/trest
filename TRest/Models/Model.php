@@ -97,7 +97,7 @@ abstract class Model extends Base {
      *
      * Finds a entity by it's specified identifer
      *
-     * @return TRestModel
+     * @return Model
      */
     public static function findOne($id) {
         return self::find()->findOne($id);
