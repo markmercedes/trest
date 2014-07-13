@@ -1,16 +1,28 @@
 <?php
 
-use TRest\Models\TRestModel;
+use TRest\Models\Model;
 
-class StackOverflowUser extends TRestModel {
+class StackOverflowUser extends Model {
     
     protected static $configName = 'StackOverflow';
     
-    public static $listItemNode = 'users';
+    public static $listItemNode = 'items';
     
-    public static $singleItemNode = 'users';
+    public static $singleItemNode = 'items';
     
     public static $resource = 'users';
+    
+    public static function findOne($id){
+        return parent::find()->fromSO()->findOne($id);
+    }
+    
+    public static function find(){
+        return parent::find()->fromSO();
+    }
+    
+    public function scopeFromSO($query){
+        return $query->where('site', 'stackoverflow');
+    }
 
     public function fields() {
         return array(

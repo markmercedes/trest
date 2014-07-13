@@ -1,8 +1,8 @@
 <?php
 
-use TRest\Models\TRestModel;
+use TRest\Models\Model;
 
-class StackOverflowUserBadge extends TRestModel {
+class StackOverflowUserBadge extends Model {
 
     public function fields() {
         return array(

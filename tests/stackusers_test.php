@@ -1,6 +1,6 @@
 <?php
 
-require_once realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'trest_init.php');
+require_once realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'TRest' . DIRECTORY_SEPARATOR . 'trest_init.php');
 require_once realpath(__DIR__ . DIRECTORY_SEPARATOR . 'models' . DIRECTORY_SEPARATOR . 'StackOverflowUser.php');
 require_once realpath(__DIR__ . DIRECTORY_SEPARATOR . 'models' . DIRECTORY_SEPARATOR . 'StackOverflowUserBadge.php');
 
@@ -11,9 +11,9 @@ $id = (int)$id;
  
 
 if($id){
-    $result = StackOverflowUser::find($id);
+    $result = StackOverflowUser::findOne($id);
 } else {
-    $result = StackOverflowUser::findAll();
+    $result = StackOverflowUser::find()->all();
 }
 
 echo json_encode($result);
