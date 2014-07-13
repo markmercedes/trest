@@ -8,7 +8,7 @@
  */
 namespace TRest\Cache;
 
-interface TRestCacheAdapterInterface {
+interface CacheAdapterInterface {
 
     /**
      * 

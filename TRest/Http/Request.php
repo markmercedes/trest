@@ -8,7 +8,7 @@
  */
 namespace TRest\Http;
 
-class TRestRequest extends TRestRequestProperties {
+class Request extends RequestProperties {
 
     /**
      * A hashed url used as an unique key in order to be able to use caching for

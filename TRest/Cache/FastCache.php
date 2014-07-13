@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Implementacion of {@link TRestCacheAdapterInterface} to use this library
+ * Implementacion of {@link CacheAdapterInterface} to use this library
  * caching capabilities with the Third Party Library {@link \phpFastCache}
  * {@link https://github.com/khoaofgod/phpfastcache}
  *
@@ -10,7 +10,7 @@
  */
 namespace TRest\Cache;
 
-class TRestFastCache implements TRestCacheAdapterInterface {
+class FastCache implements CacheAdapterInterface {
 
     /**
      * Loads the fast cache Third Party library
@@ -24,7 +24,7 @@ class TRestFastCache implements TRestCacheAdapterInterface {
 
     /**
      * (non-PHPdoc)
-     * @see \TRest\Cache\TRestCacheAdapterInterface::delete()
+     * @see \TRest\Cache\CacheAdapterInterface::delete()
      */
     public function delete($key) {
         \phpFastCache::delete($key);
@@ -32,7 +32,7 @@ class TRestFastCache implements TRestCacheAdapterInterface {
 
     /**
      * (non-PHPdoc)
-     * @see \TRest\Cache\TRestCacheAdapterInterface::exists()
+     * @see \TRest\Cache\CacheAdapterInterface::exists()
      */
     public function exists($key) {
         return (boolean) (\phpFastCache::get($key));
@@ -40,7 +40,7 @@ class TRestFastCache implements TRestCacheAdapterInterface {
 
     /**
      * (non-PHPdoc)
-     * @see \TRest\Cache\TRestCacheAdapterInterface::get()
+     * @see \TRest\Cache\CacheAdapterInterface::get()
      */
     public function get($key) {
         return \phpFastCache::get($key);
@@ -48,7 +48,7 @@ class TRestFastCache implements TRestCacheAdapterInterface {
     
     /**
      * (non-PHPdoc)
-     * @see \TRest\Cache\TRestCacheAdapterInterface::set()
+     * @see \TRest\Cache\CacheAdapterInterface::set()
      */
     public function set($key, $data, $ttl = TREST_DEFAULT_CACHE_TTL) {
         \phpFastCache::set($key, $data, $ttl);

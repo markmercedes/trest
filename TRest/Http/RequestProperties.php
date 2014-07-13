@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Base class for the {@link TRestRequest}
+ * Base class for the {@link Request}
  *
  * @author Marcos Mercedes <marcos.mercedesn@gmail.com>
  * @package TRest\Http
  */
 namespace TRest\Http;
 
-class TRestRequestProperties {
+class RequestProperties {
 
     /**
      *
@@ -32,11 +32,11 @@ class TRestRequestProperties {
 
     /**
      *
-     * @var {@link TRestClient method} The HTTP method that should be executed,
-     *      supported types are: TRestClient::GET, TRestClient::POST,
-     *      TRestClient::PUT, TRestClient::DELETE
+     * @var {@link Client method} The HTTP method that should be executed,
+     *      supported types are: Client::GET, Client::POST,
+     *      Client::PUT, Client::DELETE
      */
-    protected $method = TRestClient::GET;
+    protected $method = Client::GET;
 
     /**
      *
@@ -75,7 +75,7 @@ class TRestRequestProperties {
     /**
      *
      * @param string $path            
-     * @return \TRest\Http\TRestRequestProperties
+     * @return \TRest\Http\RequestProperties
      */
     public function setPath($path) {
         $this->path = $path;
@@ -93,7 +93,7 @@ class TRestRequestProperties {
     /**
      *
      * @param mixed $entity            
-     * @return \TRest\Http\TRestRequestProperties
+     * @return \TRest\Http\RequestProperties
      */
     public function setEntity($entity) {
         $this->entity = $entity;
@@ -111,7 +111,7 @@ class TRestRequestProperties {
     /**
      *
      * @param unknown $resource            
-     * @return \TRest\Http\TRestRequestProperties
+     * @return \TRest\Http\RequestProperties
      */
     public function setResource($resource) {
         $this->resource = $resource;
@@ -121,7 +121,7 @@ class TRestRequestProperties {
     /**
      *
      * @param string $url            
-     * @return \TRest\Http\TRestRequestProperties
+     * @return \TRest\Http\RequestProperties
      */
     public function setUrl($url) {
         $this->url = $url;
@@ -139,8 +139,8 @@ class TRestRequestProperties {
     /**
      *
      * @param
-     *            {@link TRestClient} $method
-     * @return \TRest\Http\TRestRequestProperties
+     *            {@link Client} $method
+     * @return \TRest\Http\RequestProperties
      */
     public function setMethod($method) {
         $this->method = $method;
@@ -149,7 +149,7 @@ class TRestRequestProperties {
 
     /**
      *
-     * @return TRestClient http method
+     * @return Client http method
      */
     public function getMethod() {
         return $this->method;
@@ -158,7 +158,7 @@ class TRestRequestProperties {
     /**
      *
      * @param array $parameters            
-     * @return \TRest\Http\TRestRequestProperties
+     * @return \TRest\Http\RequestProperties
      */
     public function setParameters($parameters) {
         $this->parameters = $parameters;
@@ -179,7 +179,7 @@ class TRestRequestProperties {
      *
      * @param string $parameter            
      * @param string $value            
-     * @return \TRest\Http\TRestRequestProperties
+     * @return \TRest\Http\RequestProperties
      */
     public function setParameter($parameter, $value) {
         $this->parameters[$parameter] = $value;
@@ -198,7 +198,7 @@ class TRestRequestProperties {
     /**
      *
      * @param string $username            
-     * @return \TRest\Http\TRestRequestProperties
+     * @return \TRest\Http\RequestProperties
      */
     public function setUsername($username) {
         $this->username = $username;
@@ -216,7 +216,7 @@ class TRestRequestProperties {
     /**
      *
      * @param string $password            
-     * @return \TRest\Http\TRestRequestProperties
+     * @return \TRest\Http\RequestProperties
      */
     public function setPassword($password) {
         $this->password = $password;

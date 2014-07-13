@@ -9,9 +9,9 @@
  */
 namespace TRest\Models;
 
-use TRest\Config\TRestConfigFactory;
-use TRest\Config\TRestConfig;
-use TRest\Http\TRestClient;
+use TRest\Config\ConfigFactory;
+use TRest\Config\Config;
+use TRest\Http\Client;
 
 /**
  *
@@ -31,8 +31,9 @@ abstract class TRestModelMapper extends TRestModelEntity {
      * @return TRest\Models\TRestModel
      */
     protected static function mapToObject($json_obj, $class) {
-        if (! $json_obj)
+        if (! $json_obj){
             return null;
+        }
         return new $class($json_obj);
     }
 
@@ -226,7 +227,7 @@ abstract class TRestModelEntity {
     public static function isCacheEnabled() {
         if (self::$isCacheEnabled === null) {
             $parents = class_implements(get_class(self::getConfig()->getCacheAdapter()));
-            return self::$isCacheEnabled = isset($parents['TRest\Cache\TRestCacheAdapterInterface']);
+            return self::$isCacheEnabled = isset($parents['TRest\Cache\CacheAdapterInterface']);
         }
         return self::$isCacheEnabled;
     }
@@ -300,10 +301,10 @@ abstract class TRestModelEntity {
 
     /**
      *
-     * @return TRestConfig
+     * @return Config
      */
     protected static function getConfig() {
-        return TRestConfigFactory::get(static::$configName);
+        return ConfigFactory::get(static::$configName);
     }
 
     /**
@@ -323,23 +324,23 @@ abstract class TRestModelEntity {
  * @author Marcos Mercedes <marcos.mercedesn@gmail.com>
  * @package TRest\Models
  */
-abstract class TRestModelBase extends TRestModelMapper {
+abstract class Base extends TRestModelMapper {
 
     /**
      *
-     * @var \TRest\Http\TRestClient
+     * @var \TRest\Http\Client
      */
     protected static $requestClient;
 
     /**
      *
-     * returns the active {@link \TRest\Http\TRestClient} used to perform
+     * returns the active {@link \TRest\Http\Client} used to perform
      * requests
      *
-     * @return \TRest\Http\TRestClient
+     * @return \TRest\Http\Client
      */
     protected static function getRequestClient() {
-        return self::$requestClient ? self::$requestClient : self::$requestClient = new TRestClient();
+        return self::$requestClient ? self::$requestClient : self::$requestClient = new Client();
     }
 
     /**
@@ -405,9 +406,10 @@ abstract class TRestModelBase extends TRestModelMapper {
      * @param string $type            
      */
     protected function assignEmptyPropertyValue($fieldName, $type) {
-        if ($type == 'integer')
+        if ($type == 'integer'){
             $this->{$fieldName} = 0;
-        else
+        } else {
             $this->{$fieldName} = null;
+        }
     }
 }
