@@ -13,7 +13,7 @@ $id = (int)$id;
 if($id){
     $result = StackOverflowUser::findOne($id);
 } else {
-    $result = StackOverflowUser::find()->all();
+    $result = StackOverflowUser::find()->limit(3)->page(7)->sortBy('name')->order('asc')->all();
 }
 
 echo json_encode($result);
