@@ -45,5 +45,5 @@ ConfigFactory::add('default', new Config(array(
  */
 ConfigFactory::add('StackOverflow', new Config(array(
     'apiUrl' => 'https://api.stackexchange.com/2.2/',
-    //'cacheAdapter' => new DesaCache(new \Desarrolla2\Cache\Adapter\Apc())
+    'cacheAdapter' => new DesaCache(new \Desarrolla2\Cache\Adapter\Apc())
 )));
