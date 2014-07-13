@@ -24,6 +24,22 @@ class StackOverflowUser extends Model {
         return $query->where('site', 'stackoverflow');
     }
 
+    public function scopePage($query, $page){
+        return $query->where('page', $page);
+    }
+
+    public function scopeLimit($query, $limit){
+        return $query->where('pagesize', $limit);
+    }
+
+    public function scopeSortBy($query, $sortBy){
+        return $query->where('sort', $sortBy);
+    }
+
+    public function scopeOrder($query, $order){
+        return $query->where('order', $order);
+    }
+
     public function fields() {
         return array(
             'user_id' => array(
@@ -32,11 +48,8 @@ class StackOverflowUser extends Model {
             'user_type' => array(
                 'type' => 'string'
             ),
-            'location' => array(
-                'type' => 'string'
-            ),
-            'website_url' => array(
-                'type' => 'string'
+            'reputation' => array(
+                'type' => 'integer'
             ),
             'display_name' => array(
                 'type' => 'string'
@@ -44,10 +57,13 @@ class StackOverflowUser extends Model {
             'reputation' => array(
                 'type' => 'integer'
             ),
-            'age' => array(
-                'type' => 'integer'
+            'is_employee' => array(
+                'type' => 'boolean'
             ),
-            'about_me' => array(
+            'link' => array(
+                'type' => 'string'
+            ),
+            'profile_image' => array(
                 'type' => 'string'
             ),
             'last_access_date' => array(
