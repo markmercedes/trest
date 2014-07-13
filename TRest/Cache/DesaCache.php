@@ -10,16 +10,17 @@
  */
 namespace TRest\Cache;
 
-class FastCache implements CacheAdapterInterface {
+use Desarrolla2\Cache\Cache;
 
+class DesaCache implements CacheAdapterInterface {
+
+    private $cache = null;
+    
     /**
      * Loads the fast cache Third Party library
      */
-    public function __construct() {
-        if (! class_exists('phpFastCache')) {
-            require_once (TREST_LIB_THIRD_PARTY_PATH . DIRECTORY_SEPARATOR . 'Caching' . DIRECTORY_SEPARATOR . 'phpfastcache' . DIRECTORY_SEPARATOR . 'php_fast_cache.php');
-        }
-        \phpFastCache::$storage = "apc";
+    public function __construct($adapter) {
+        $this->cache = new Cache($adapter);
     }
 
     /**
@@ -27,7 +28,7 @@ class FastCache implements CacheAdapterInterface {
      * @see \TRest\Cache\CacheAdapterInterface::delete()
      */
     public function delete($key) {
-        \phpFastCache::delete($key);
+        $this->cache->delete(__CLASS__ . $key);
     }
 
     /**
@@ -35,7 +36,7 @@ class FastCache implements CacheAdapterInterface {
      * @see \TRest\Cache\CacheAdapterInterface::exists()
      */
     public function exists($key) {
-        return (boolean) (\phpFastCache::get($key));
+        return $this->cache->has(__CLASS__ . $key);
     }
 
     /**
@@ -43,7 +44,7 @@ class FastCache implements CacheAdapterInterface {
      * @see \TRest\Cache\CacheAdapterInterface::get()
      */
     public function get($key) {
-        return \phpFastCache::get($key);
+        return $this->cache->get(__CLASS__ . $key);
     }
     
     /**
@@ -51,7 +52,7 @@ class FastCache implements CacheAdapterInterface {
      * @see \TRest\Cache\CacheAdapterInterface::set()
      */
     public function set($key, $data, $ttl = TREST_DEFAULT_CACHE_TTL) {
-        \phpFastCache::set($key, $data, $ttl);
+        $this->cache->set(__CLASS__ . $key, $data, $ttl);
         return $this;
     }
 }
