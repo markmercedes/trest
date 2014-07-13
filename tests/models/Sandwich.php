@@ -1,8 +1,8 @@
 <?php
 
-use TRest\Models\TRestModel;
+use TRest\Models\Model;
 
-class Sandwich extends TRestModel {
+class Sandwich extends Model {
 
     protected static $resource = 'sandwiches';
 
