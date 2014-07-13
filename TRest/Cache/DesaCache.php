@@ -2,8 +2,8 @@
 
 /**
  * Implementacion of {@link CacheAdapterInterface} to use this library
- * caching capabilities with the Third Party Library {@link \phpFastCache}
- * {@link https://github.com/khoaofgod/phpfastcache}
+ * caching capabilities with the Third Party Library {@link \Desarrolla2\Cache\Cache}
+ * {@link https://github.com/desarrolla2/Cache/tree/master}
  *
  * @author Marcos Mercedes <marcos.mercedesn@gmail.com>
  * @package TRest\Cache
