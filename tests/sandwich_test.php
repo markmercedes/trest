@@ -12,6 +12,11 @@ $id = (int)$id;
 
 if($id){
     $result = Sandwich::findOne($id);
+    $result->ingredients[0]->name = 'jamon';
+    $result->title = "el mio";
+    $result->price = 9200;
+    ($result->save());
+    $result = Sandwich::find()->setCacheTtl(000)->findOne($id);
 } else {
     $result = Sandwich::find()->all();
 }
