@@ -63,6 +63,11 @@ class Query {
         return $this->resource;
     }
 
+    public function setCacheTtl($cacheTtl){
+        $this->cacheTtl = $cacheTtl;
+        return $this;
+    }
+
     public function getCacheTtl(){
         return $this->cacheTtl;
     }
