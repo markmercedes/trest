@@ -7,6 +7,7 @@ TRest is an ORM that maps REST resources to PHP objects. Designed to use in appl
 There is a sample file name trest_init.php which contains a default configuration which might help you understrand how you can initialize the library before start using it.
 
 
+```php
     <?php
 
     /**
@@ -33,6 +34,7 @@ There is a sample file name trest_init.php which contains a default configuratio
         */
         'cacheAdapter' => new DesaCache(new \Desarrolla2\Cache\Adapter\Apc())
     )));
+```
 
 ## Introduction
 
