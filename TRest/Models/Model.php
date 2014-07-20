@@ -128,6 +128,6 @@ abstract class Model extends Base {
      */
     public function __construct($values = null) {
         $this->constructObject($values);
-        $this->build();
+        $this->build($values);
     }
 }

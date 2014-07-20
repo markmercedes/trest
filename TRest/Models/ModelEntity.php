@@ -199,6 +199,6 @@ abstract class ModelEntity {
      * code after the construction of the model, this function is invoked after
      * construct
      */
-    public function build() {
+    public function build($values = null) {
     }
 }
