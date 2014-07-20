@@ -43,7 +43,7 @@ abstract class Model extends Base {
      * @return Model
      */
     public static function findOne($id) {
-        return self::find()->findOne($id);
+        return static::find()->findOne($id);
     }
     
     public static function findOneByQuery($id, Query $query){
