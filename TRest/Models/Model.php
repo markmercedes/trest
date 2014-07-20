@@ -9,9 +9,9 @@
  */
 namespace TRest\Models;
 
-use TRest\Http\TRestRequest;
+use TRest\Http\Request;
 
-abstract class TRestModel extends TRestModelBase {
+abstract class Model extends Base {
 
     /**
      * Creates (POST) or updates(PUT) an entity
@@ -19,7 +19,7 @@ abstract class TRestModel extends TRestModelBase {
      * @return boolean
      */
     public function save() {
-        $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setResource(static::$resource)->setPath($this->{static::$recordId})->setEntity(json_encode(array(
+        $request = (new Request())->setUrl(self::getConfig()->getApiUrl())->setResource(static::$resource)->setPath($this->{static::$recordId})->setEntity(json_encode(array(
             static::$singleItemNode => $this->mapToJSON()
         )));
         $result = $this->{static::$recordId} ? self::getRequestClient()->put($request) : self::getRequestClient()->post($request);
@@ -32,7 +32,7 @@ abstract class TRestModel extends TRestModelBase {
      * Deletes an entity
      */
     public function delete() {
-        $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setResource(static::$resource)->setPath($this->{static::$recordId});
+        $request = (new Request())->setUrl(self::getConfig()->getApiUrl())->setResource(static::$resource)->setPath($this->{static::$recordId});
         self::getRequestClient()->delete($request);
     }
 
@@ -40,55 +40,51 @@ abstract class TRestModel extends TRestModelBase {
      *
      * Finds a entity by it's specified identifer
      *
-     * @return TRestModel
+     * @return Model
      */
-    public static function find($id, $params = array(), $path = null, $cacheTtl = TREST_DEFAULT_CACHE_TTL) {
-        if(is_array($path)){
-            $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path[1])->setResource($path[0])->setEntity($id)->setParameters($params);
-        } else {
-            $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path)->setResource(static::$resource)->setEntity($id)->setParameters($params);
-        }
+    public static function findOne($id) {
+        return self::find()->findOne($id);
+    }
+    
+    public static function findOneByQuery($id, Query $query){
+        $request = self::getRequest($query, $id);
         $cacheKey = $request->getUrlHash();
-        if (self::isValidCache($cacheTtl)) {
+        if (self::isValidCache($query->getCacheTtl())) {
             if (self::getConfig()->getCacheAdapter()->exists($cacheKey)) {
                 return self::getConfig()->getCacheAdapter()->get($cacheKey);
             }
             $singleItemNode = self::getSingleItemNode(self::getRequestClient()->get($request));
             if (! $singleItemNode)
                 return null;
-            return self::getConfig()->getCacheAdapter()->set($cacheKey, self::mapToObject($singleItemNode, get_called_class()), $cacheTtl)->get($cacheKey);
+            return self::getConfig()->getCacheAdapter()->set($cacheKey, self::mapToObject($singleItemNode, get_called_class()), $query->getCacheTtl())->get($cacheKey);
         } else {
             return self::mapToObject(self::getSingleItemNode(self::getRequestClient()->get($request)), get_called_class());
-        }
+        }        
     }
 
-    /**
-     *
-     * Returns an object with a list of objects in a property named items and in
-     * case that pagination is used, in another property name count returns the
-     * total items that are available for this response
-     *
-     * @param number $limit            
-     * @param number $page            
-     * @param array $params            
-     * @param string $path            
-     * @param number $cacheTtl            
-     * @return array of TRestModels
-     */
-    public static function findAll($limit = 0, $page = 0, $params = array(), $path = null, $cacheTtl = TREST_DEFAULT_CACHE_TTL) {
-        if(is_array($path)){
-            $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path[1])->setResource($path[0])->setParameters($params)->setParameter('limit', $limit)->setParameter('page', $page);
-        } else {
-            $request = (new TRestRequest())->setUrl(self::getConfig()->getApiUrl())->setPath($path)->setResource(static::$resource)->setParameters($params)->setParameter('limit', $limit)->setParameter('page', $page);
-        }
+    public static function find(){
+        return new Query(new static);
+    }
+    
+    protected static function getRequest($query, $id = null){
+        return (new Request())
+        ->setUrl(self::getConfig()->getApiUrl())
+        ->setPath($query->getPath())
+        ->setResource($query->getResource() ? $query->getResource() : static::$resource)
+        ->setEntity($id)
+        ->setParameters($query->toParams());
+    }
+
+    public static function findByQuery($query){
+        $request = self::getRequest($query);
         $cacheKey = $request->getUrlHash();
-        if (self::isValidCache($cacheTtl)) {
+        if (self::isValidCache($query->getCacheTtl())) {
             if (self::getConfig()->getCacheAdapter()->exists($cacheKey)) {
                 return self::getConfig()->getCacheAdapter()->get($cacheKey);
             }
         }
         $response = self::getRequestClient()->get($request);
-        if(is_array($path) && array_key_exists('ITEM_NODE', $path)){
+        if(is_array($query->getPath()) && array_key_exists('ITEM_NODE', $query->getPath())){
             $responseItems = self::getListItemNode($response, $path['ITEM_NODE']);
         } else {
             $responseItems = self::getListItemNode($response);
@@ -99,8 +95,8 @@ abstract class TRestModel extends TRestModelBase {
         foreach ($responseItems as $item) {
             $result->items[] = self::mapToObject($item, get_called_class());
         }
-        if (self::isValidCache($cacheTtl)) {
-            self::getConfig()->getCacheAdapter()->set($cacheKey, $result, $cacheTtl);
+        if (self::isValidCache($query->getCacheTtl())) {
+            self::getConfig()->getCacheAdapter()->set($cacheKey, $result, $query->getCacheTtl());
         }
         return $result;
     }

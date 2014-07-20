@@ -8,7 +8,7 @@
  */
 namespace TRest\Http;
 
-class TRestClient {
+class Client {
 
     const POST = 'POST';
 
@@ -22,10 +22,10 @@ class TRestClient {
      * 
      * HTTP POST
      * 
-     * @param TRestRequest $request
+     * @param Request $request
      * @return mixed
      */
-    public function post(TRestRequest $request) {
+    public function post(Request $request) {
         return $this->execute($request->setMethod(self::POST));
     }
 
@@ -33,10 +33,10 @@ class TRestClient {
      * 
      * HTTP GET
      * 
-     * @param TRestRequest $request
+     * @param Request $request
      * @return mixed
      */
-    public function get(TRestRequest $request) {
+    public function get(Request $request) {
         return $this->execute($request->setMethod(self::GET));
     }
 
@@ -44,10 +44,10 @@ class TRestClient {
      * 
      * HTTP PUT
      * 
-     * @param TRestRequest $request
+     * @param Request $request
      * @return mixed
      */
-    public function put(TRestRequest $request) {
+    public function put(Request $request) {
         return $this->execute($request->setMethod(self::PUT));
     }
 
@@ -55,23 +55,23 @@ class TRestClient {
      * 
      * HTTP DELETE
      * 
-     * @param TRestRequest $request
+     * @param Request $request
      * @return mixed
      */
-    public function delete(TRestRequest $request) {
+    public function delete(Request $request) {
         return $this->execute($request->setMethod(self::DELETE));
     }
 
     /**
      * 
-     * creates a curl resource with the parameters provided by the {@link TRestRequest} object
+     * creates a curl resource with the parameters provided by the {@link Request} object
      * 
-     * @param TRestRequest $request
+     * @param Request $request
      * @return curl resource
      */
-    private function getCurlInstance(TRestRequest $request) {
+    private function getCurlInstance(Request $request) {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $request->buildUrl());
+        curl_setopt($ch, CURLOPT_URL, $request->buildUrl(true, ($request->getMethod() == 'GET')));
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
@@ -93,10 +93,10 @@ class TRestClient {
      * sets the POST/PUT fields to the curl resource
      * 
      * @param curl resource $ch
-     * @param TRestRequest $request
+     * @param Request $request
      * @return curl resource
      */
-    private function setPostFields($ch, TRestRequest $request) {
+    private function setPostFields($ch, Request $request) {
         $entityProperties = $request->getEntity();
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $request->getMethod());
         curl_setopt($ch, CURLOPT_POSTFIELDS, $entityProperties);
@@ -112,10 +112,10 @@ class TRestClient {
      * sets curl method to the curl resource handled by the request
      * 
      * @param curl resource $ch
-     * @param TRestRequest $request
+     * @param Request $request
      * @return curl resource
      */
-    private function setCurlMethod($ch, TRestRequest $request) {
+    private function setCurlMethod($ch, Request $request) {
         switch ($request->getMethod()) {
             case self::POST :
             case self::PUT :
@@ -135,11 +135,11 @@ class TRestClient {
      * 
      * Executes http request 
      * 
-     * @param TRestRequest $request
+     * @param Request $request
      * @throws \Exception if the response http code is 400 
      * @return mixed web service response
      */
-    public function execute(TRestRequest $request) {
+    public function execute(Request $request) {
         $ch = $this->setCurlMethod($this->getCurlInstance($request), $request);
         $result = curl_exec($ch);
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);

@@ -1,11 +1,11 @@
 <?php
 
 /**
- * This class is a factory of multiple TRestConfig, the name 'default' will be
+ * This class is a factory of multiple Config, the name 'default' will be
  * used for the default config by your models. So, somewhere in your application
  * <trest_init.php is your file, look for it>
  *
- * TRestConfigFactory::add('default', new TRestConfig(array( 'apiUrl' =>
+ * ConfigFactory::add('default', new Config(array( 'apiUrl' =>
  * 'your_api_url', )));
  *
  *
@@ -14,7 +14,7 @@
  */
 namespace TRest\Config;
 
-class TRestConfigFactory {
+class ConfigFactory {
 
     private static $configs = array();
 
@@ -23,9 +23,9 @@ class TRestConfigFactory {
      * Adds a configuration to this factory 
      * 
      * @param string $name
-     * @param TRestConfig $config
+     * @param Config $config
      */
-    public static function add($name, TRestConfig $config) {
+    public static function add($name, Config $config) {
         self::$configs[$name] = $config;
     }
 
@@ -34,7 +34,7 @@ class TRestConfigFactory {
      * returns an existing configuration
      * 
      * @param string $configName
-     * @return TRestConfig
+     * @return Config
      */
     public static function get($configName) {
         return self::$configs[$configName];

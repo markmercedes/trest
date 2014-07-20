@@ -8,7 +8,7 @@
  */
 namespace TRest\Http;
 
-class TRestRequest extends TRestRequestProperties {
+class Request extends RequestProperties {
 
     /**
      * A hashed url used as an unique key in order to be able to use caching for
@@ -27,14 +27,14 @@ class TRestRequest extends TRestRequestProperties {
      *            returned
      * @return string
      */
-    public function buildUrl($addParameters = true) {
+    public function buildUrl($addParameters = true, $addEntity = true) {
         $array = array(
             rtrim($this->getUrl(), '/'),
             $this->getResource()
         );
         if ($this->getPath())
             $array[] = $this->getPath();
-        if ($this->getEntity())
+        if ($addEntity && $this->getEntity())
             $array[] = $this->getEntity();
         if ($addParameters) {
             if (count($this->getParameters()))

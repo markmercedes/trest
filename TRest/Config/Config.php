@@ -16,7 +16,7 @@ namespace TRest\Config;
  * @author Marcos Mercedes <marcos.mercedesn@gmail.com>
  * @package TRest\Config
  */
-class TRestConfig {
+class Config {
 
     /**
      *
@@ -80,7 +80,7 @@ class TRestConfig {
 
     /**
      *
-     * @return TRestCacheAdapterInterface
+     * @return CacheAdapterInterface
      */
     public function getCacheAdapter() {
         return $this->cacheAdapter;
