@@ -11,68 +11,6 @@ namespace TRest\Models;
 
 use TRest\Http\Request;
 
-class Query {
-    
-    public function __call($method, $arguments){
-        array_unshift($arguments, $this);
-        return call_user_func_array(array($this->instance, 'scope' . ($method)), $arguments);
-    }
-
-    public function __construct($instance){
-        $this->instance = $instance;
-        $this->path = null;
-        $this->resource = null;
-        $this->cacheTtl = TREST_DEFAULT_CACHE_TTL;
-        $this->query = array();
-    }
-
-    public function where($key, $value){
-        $this->query[$key] = $value;
-        return $this;
-    }
-
-    public function all(){
-        $klass = get_class($this->instance);
-        return $klass::findByQuery($this);
-    }
-
-    public function findOne($id){
-        $klass = get_class($this->instance);
-        return $klass::findOneByQuery($id, $this);
-    }
-
-    public function toParams(){
-        return $this->query;
-    }
-    
-    public function setPath($path){
-        $this->path = $path;
-        return $this;
-    }
-
-    public function getPath(){
-        return $this->path;
-    }
-
-    public function setResource($resource){
-        $this->resource = $resource;
-        return $this;
-    }
-
-    public function getResource(){
-        return $this->resource;
-    }
-
-    public function setCacheTtl($cacheTtl){
-        $this->cacheTtl = $cacheTtl;
-        return $this;
-    }
-
-    public function getCacheTtl(){
-        return $this->cacheTtl;
-    }
-}
-
 abstract class Model extends Base {
 
     /**
