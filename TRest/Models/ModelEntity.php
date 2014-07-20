@@ -153,6 +153,9 @@ abstract class ModelEntity {
      * @return string
      */
     public static function getListItemNode($response, $itemNode = 'NONE') {
+        if(static::$listItemNode == 'NONE'){
+            return $response;
+        }
         if(($itemNode != 'NONE')){
             if(!$itemNode)
                 return $response;
