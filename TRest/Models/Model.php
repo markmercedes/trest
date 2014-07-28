@@ -92,8 +92,10 @@ abstract class Model extends Base {
         $result = new \stdClass();
         $result->items = array();
         $result->count = self::getListCountNode($response);
-        foreach ($responseItems as $item) {
-            $result->items[] = self::mapToObject($item, get_called_class());
+        if($responseItems){
+            foreach ($responseItems as $item) {
+                $result->items[] = self::mapToObject($item, get_called_class());
+            }
         }
         if (self::isValidCache($query->getCacheTtl())) {
             self::getConfig()->getCacheAdapter()->set($cacheKey, $result, $query->getCacheTtl());

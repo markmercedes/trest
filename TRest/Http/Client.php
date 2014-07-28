@@ -145,7 +145,7 @@ class Client {
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if ($status >= 400) {
             curl_close($ch);
-            throw new \Exception($result, $status);
+            return null;
         }
         curl_close($ch);
         return json_decode($result);
