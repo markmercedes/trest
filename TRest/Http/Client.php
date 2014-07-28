@@ -79,9 +79,6 @@ class Client {
             'Accept: application/json',
             'Accept-Charset: utf-8'
         ));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Expect:'
-        ));
         if ($request->getUsername() && $request->getPassword()) {
             curl_setopt($ch, CURLOPT_USERPWD, $request->getUsername() . ':' . $request->getPassword());
         }
