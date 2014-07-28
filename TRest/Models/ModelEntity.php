@@ -162,13 +162,33 @@ abstract class ModelEntity {
             return $response->{$itemNode};
         }
         $result = null;
-        if (static::$listItemNode)
-            $result = $response->{static::$listItemNode};
-        else if (self::getConfig()->getListItemNode())
+        if (static::$listItemNode){
+            $propetryTree = explode('->', static::$listItemNode);
+            if(count($propetryTree) > 1){
+                $result = self::getFromPropertyTree($response, $propetryTree);
+            } else {
+                $result = $response->{static::$listItemNode};
+            }
+        } else if (self::getConfig()->getListItemNode()){
+            $propetryTree = explode('->', self::getConfig()->getListItemNode());
+            if(count($propetryTree) > 1){
+                $result = self::getFromPropertyTree($response, $propetryTree);
+            } else {
+                $result = $response->{self::getConfig()->getListItemNode()};
+            }
             $result = $response->{self::getConfig()->getListItemNode()};
-        else
+        } else {
             $result = $response;
+        }
         return $result;
+    }
+    
+    public static function getFromPropertyTree($container, $propertyTree){
+        $items = $container;
+        foreach ($propertyTree as $property) {
+            $items = $items->{$property};
+        }
+        return $items;
     }
 
     /**
