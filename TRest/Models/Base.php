@@ -60,7 +60,7 @@ abstract class Base extends ModelMapper {
             $this->{$key} = isset($values->{$key}) ? $values->{$key} : null;
             if (isset($values->{$key})) {
                 switch ($fields[$key]['type']) {
-                    case 'DateTime' :
+                    case '\DateTime' :
                         {
                             if (array_key_exists('format', $fields[$key])) {
                                 $date = new \DateTime();
