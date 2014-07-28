@@ -18,7 +18,6 @@ require (realpath(__DIR__ . '/../vendor/autoload.php'));
 
 use TRest\Config\ConfigFactory;
 use TRest\Config\Config;
-use TRest\Cache\DesaCache;
 
 /**
  * Api brought to you by Josue Abreu <https://github.com/gotjosh> from Pixel
@@ -31,8 +30,7 @@ use TRest\Cache\DesaCache;
  */
 ConfigFactory::add('default', new Config(array(
     'apiUrl' => 'http://pixelpt-sandwich-api.herokuapp.com/',
-    'singleItemNode' => 'sandwich',
-    'cacheAdapter' => new DesaCache(new \Desarrolla2\Cache\Adapter\Apc())
+    'singleItemNode' => 'sandwich'
 )));
 
 /**
@@ -45,5 +43,4 @@ ConfigFactory::add('default', new Config(array(
  */
 ConfigFactory::add('StackOverflow', new Config(array(
     'apiUrl' => 'https://api.stackexchange.com/2.2/',
-    'cacheAdapter' => new DesaCache(new \Desarrolla2\Cache\Adapter\Apc())
 )));

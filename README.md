@@ -28,11 +28,10 @@ ConfigFactory::add('default', new Config(array(
     * To create your own cache adapters, implement the interface TRest\Cache\CacheAdapterInterface
     * and provide an instance of your class to the configuration key named cacheAdapter of your connection.
     *
-    * The class DesaCache is just a class that implements the interface TRest\Cache\CacheAdapterInterface and uses
-    * the library https://github.com/desarrolla2/Cache to handle the caching functionallity.
+    * Here should be passed an instance of a class that implements the interface TRest\Cache\CacheAdapterInterface.
     *
     */
-    'cacheAdapter' => new DesaCache(new \Desarrolla2\Cache\Adapter\Apc())
+    'cacheAdapter' => new ClassImplementingCacheAdapterInterface()
 )));
 ```
 
