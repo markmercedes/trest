@@ -37,12 +37,22 @@ class Request extends RequestProperties {
         if ($addEntity && $this->getEntity())
             $array[] = $this->getEntity();
         if ($addParameters) {
-            if (count($this->getParameters()))
-                $array[] = '?' . http_build_query($this->getParameters());
+            if (count($this->getParameters())) {
+                $array[] = '?' . $this->getFormattedHttpParameters();
+            }
             array_walk($array, function (&$item, $key) {
                 $item = rtrim($item, '/');
             });
         }
         return implode('/', $array);
+    }
+
+    private function getFormattedHttpParameters(){
+        $params = array();
+        $parameters = $this->getParameters();
+        foreach($parameters as $key => $values) {
+            $params[] = "$key=$values";
+        }
+        return implode( $params, '&' );
     }
 }
