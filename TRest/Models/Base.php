@@ -48,12 +48,16 @@ abstract class Base extends ModelMapper {
         return self::$requestClient ? self::$requestClient : self::$requestClient = new Client();
     }
 
+    public static function setRequestClient($requestClient) {
+        self::$requestClient = $requestClient;
+    }
+
     /**
      *
      * assigns values to model attributes
      *
-     * @param object $values            
-     * @param array $fields            
+     * @param object $values
+     * @param array $fields
      */
     protected function assignPropertyValues($values, $fields) {
         foreach ($fields as $key => $value) {
@@ -86,8 +90,8 @@ abstract class Base extends ModelMapper {
      *
      * assigns values to attributes that are supposed relations
      *
-     * @param object $values            
-     * @param array $relations            
+     * @param object $values
+     * @param array $relations
      */
     protected function assignRelations($values, $relations) {
         foreach ($relations as $key => $value) {
@@ -107,8 +111,8 @@ abstract class Base extends ModelMapper {
     /**
      * Assigns the default value to a field
      *
-     * @param string $fieldName            
-     * @param string $type            
+     * @param string $fieldName
+     * @param string $type
      */
     protected function assignEmptyPropertyValue($fieldName, $type) {
         if ($type == 'integer'){
